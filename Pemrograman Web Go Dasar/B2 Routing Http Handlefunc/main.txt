@@ -1,0 +1,50 @@
+B.2. Routing http.HandleFunc
+Routing di Go bisa dilakukan dengan beberapa cara, di antaranya:
+
+Dengan memanfaatkan fungsi http.HandleFunc()
+Mengimplementasikan interface http.Handler pada suatu struct, untuk kemudian digunakan pada fungsi http.Handle()
+Membuat multiplexer sendiri dengan memanfaatkan struct http.ServeMux
+Pada buku ini, semua cara tersebut akan dibahas, namun khusus di chapter ini hanya http.HandleFunc() yang kita pelajari.
+
+Metode routing cara pertama dan cara kedua memiliki kesamaan yaitu sama-sama menggunakan DefaultServeMux sebagai router. Mengenai apa itu DefaultServeMux akan kita bahas lebih mendetail pada chapter lain.
+
+B.2.1. Penggunaan http.HandleFunc()
+Seperti yang sudah dijelaskan sekilas pada chapter sebelumnya, fungsi http.HandleFunc() digunakan untuk registrasi rute/endpoint beserta handler-nya. Penggunaan fungsi ini cukup mudah, panggil saja fungsi lalu isi dua parameternya.
+
+Parameter ke-1, adalah rute (atau endpoint). Sebagai contoh: /, /index, /about.
+Parameter ke-2, berisikan handler untuk rute bersangkutan. Sebagai contoh handler untuk rute / bertugas untuk menampilkan output berupa html <p>hello</p>.
+Agar lebih mudah dipahami mari langsung praktek. Siapkan file main.go dengan package adalah main, dan import package net/http di dalamnya.
+
+package main
+
+import "fmt"
+import "net/http"
+Buat fungsi main(), di dalamnya siapkan sebuah closure handlerIndex, lalu gunakan closure tersebut sebagai handler dari dua rute baru yang sebentar lagi disiapkan, yaitu rute / dan /index.
+
+func main() {
+    handlerIndex := func(w http.ResponseWriter, r *http.Request) {
+        w.Write([]byte("hello"))
+    }
+
+    http.HandleFunc("/", handlerIndex)
+    http.HandleFunc("/index", handlerIndex)
+}
+Selanjutnya, masih dalam fungsi main(), tambahkan rute /data dengan handler adalah anonymous function.
+
+func main() {
+    // ...
+
+    http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+        w.Write([]byte("hello again"))
+    })
+}
+Terakhir, jalankan web server.
+
+func main() {
+    // ...
+
+    fmt.Println("server started at localhost:9000")
+    http.ListenAndServe(":9000", nil)
+}
+B.2.2. Run & Test
+Tes dan lihat hasilnya.
